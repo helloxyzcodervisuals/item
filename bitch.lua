@@ -1,5 +1,5 @@
 repeat task.wait() until game:IsLoaded()
-
+--why
 local function isAdonisAC(tab) 
     return rawget(tab,"Detected") and typeof(rawget(tab,"Detected"))=="function" and rawget(tab,"RLocked") 
 end
@@ -1243,7 +1243,7 @@ local speedToggle = MiscMovementSection:Toggle({Name = "Speed", Default = false,
     if value then enableSpeed() else disableSpeed() end
 end})
 speedToggle:Keybind({Name = "Keybind", ShowInList = true})
-speedToggle:Slider({Name = "Value", Default = 50, Min = 16, Max = 200, Callback = function(value)
+MiscMovementSection:Slider({Name = "Value", Default = 50, Min = 16, Max = 200, Callback = function(value)
     speedValue = value
 end})
 
@@ -1260,7 +1260,7 @@ local flyToggle = MiscMovementSection:Toggle({Name = "Fly", Default = false, Cal
     end
 end})
 flyToggle:Keybind({Name = "Keybind", ShowInList = true})
-flyToggle:Slider({Name = "Speed", Default = 50, Min = 10, Max = 200, Callback = function(value)
+MiscMovementSection:Slider({Name = "Speed", Default = 50, Min = 10, Max = 200, Callback = function(value)
     flySpeed = value
 end})
 
@@ -1274,7 +1274,7 @@ local jumpToggle = MiscMovementSection:Toggle({Name = "Jump Power", Default = fa
     jumpPowerEnabled = value
     if value then enableJumpPower() else disableJumpPower() end
 end})
-jumpToggle:Slider({Name = "Value", Default = 100, Min = 50, Max = 300, Callback = function(value)
+MiscMovementSection:Slider({Name = "Value", Default = 100, Min = 50, Max = 300, Callback = function(value)
     jumpPowerValue = value
 end})
 
@@ -1328,10 +1328,10 @@ end})
 tracerToggle:Colorpicker({Name = "Color", Default = Color3.fromRGB(255,50,50), Callback = function(color)
     tracerColor = color
 end})
-tracerToggle:Slider({Name = "Width", Default = 2, Min = 1, Max = 5, Callback = function(value)
+MiscVisualsSection:Slider({Name = "Width", Default = 2, Min = 1, Max = 5, Callback = function(value)
     tracerWidth = value/1
 end})
-tracerToggle:Slider({Name = "Lifetime", Default = 10, Min = 1, Max = 100, Callback = function(value)
+MiscVisualsSection:Slider({Name = "Lifetime", Default = 10, Min = 1, Max = 100, Callback = function(value)
     tracerLifetime = value/5
 end})
 
@@ -1729,7 +1729,7 @@ playerToggle:Colorpicker({Name = "Player Color", Default = Color3.fromRGB(255,25
     richPlayerColor = color
     if richPlayerEnabled and LocalPlayer.Character then applyRichPlayer() end
 end})
-playerToggle:Slider({Name = "Transparency", Default = 0, Min = 0, Max = 100, Callback = function(value)
+VisualPlayerSection:Slider({Name = "Transparency", Default = 0, Min = 0, Max = 100, Callback = function(value)
     richPlayerTransparency = value
     if richPlayerEnabled and LocalPlayer.Character then applyRichPlayer() end
 end})
