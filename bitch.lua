@@ -403,9 +403,9 @@ local function checkClearPath(startPos,endPos)
 end
 
 local function wallbang()
-    local localHead=LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
+    local localHead = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head")
     if not localHead then return nil end
-    local target=getClosestTarget()
+    local target = getClosestTarget()
     if not target then cachedBestPositions.history={} cachedBestPositions.target=nil return nil,nil end
     local startPos=localHead.Position
     local targetPos=target.Position
@@ -424,7 +424,9 @@ local function wallbang()
             local cache=cachedBestPositions.history[i]
             local cachedShootDistance=(cache.shootPos-startPos).Magnitude
             local cachedHitDistance=(cache.hitPos-targetPos).Magnitude
-            if cachedShootDistance<=getgenv().CONFIG.Ragebot.ShootRange and cachedHitDistance<=getgenv().CONFIG.Ragebot.HitRange then
+            local midpoint=(cache.shootPos+cache.hitPos)*0.5
+            local midpointToHeadDistance=(midpoint-startPos).Magnitude
+            if cachedShootDistance<=getgenv().CONFIG.Ragebot.ShootRange and cachedHitDistance<=getgenv().CONFIG.Ragebot.HitRange and midpointToHeadDistance<=(getgenv().CONFIG.Ragebot.ShootRange*0.5)then
                 if checkClearPath(startPos,cache.shootPos) and checkClearPath(cache.shootPos,cache.hitPos) then
                     local shootToHitRay=Workspace:Raycast(cache.shootPos,(cache.hitPos-cache.shootPos).Unit*(cache.hitPos-cache.shootPos).Magnitude,raycastParams)
                     if not shootToHitRay then table.insert(stillValid,cache) end
@@ -435,15 +437,21 @@ local function wallbang()
         if#cachedBestPositions.history>0 then local selected=cachedBestPositions.history[math.random(1,#cachedBestPositions.history)] return selected.shootPos,selected.hitPos end
     end
     local validPoints={}
-    for i=1,100 do
-        local shootOffset=Vector3.new(math.random(-getgenv().CONFIG.Ragebot.ShootRange,getgenv().CONFIG.Ragebot.ShootRange),math.random(-getgenv().CONFIG.Ragebot.ShootRange,getgenv().CONFIG.Ragebot.ShootRange),math.random(-getgenv().CONFIG.Ragebot.ShootRange,getgenv().CONFIG.Ragebot.ShootRange))
-        local shootPos=startPos+shootOffset
-        local hitOffset=Vector3.new(math.random(-getgenv().CONFIG.Ragebot.HitRange,getgenv().CONFIG.Ragebot.HitRange),math.random(-getgenv().CONFIG.Ragebot.HitRange,getgenv().CONFIG.Ragebot.HitRange),math.random(-getgenv().CONFIG.Ragebot.HitRange,getgenv().CONFIG.Ragebot.HitRange))
-        local hitPos=targetPos+hitOffset
-        if(shootPos-startPos).Magnitude<=getgenv().CONFIG.Ragebot.ShootRange and(hitPos-targetPos).Magnitude<=getgenv().CONFIG.Ragebot.HitRange then
+    for i=1,75 do
+        local shootRadius=math.random()*getgenv().CONFIG.Ragebot.ShootRange
+        local shootAngle=math.random()*2*math.pi
+        local shootHeight=math.random(-getgenv().CONFIG.Ragebot.ShootRange,getgenv().CONFIG.Ragebot.ShootRange)
+        local shootPos=startPos+Vector3.new(math.cos(shootAngle)*shootRadius,shootHeight,math.sin(shootAngle)*shootRadius)
+        local hitRadius=math.random()*getgenv().CONFIG.Ragebot.HitRange
+        local hitAngle=math.random()*2*math.pi
+        local hitHeight=math.random(-getgenv().CONFIG.Ragebot.HitRange,getgenv().CONFIG.Ragebot.HitRange)
+        local hitPos=targetPos+Vector3.new(math.cos(hitAngle)*hitRadius,hitHeight,math.sin(hitAngle)*hitRadius)
+        local midpoint=(shootPos+hitPos)*0.5
+        local midpointToHeadDistance=(midpoint-startPos).Magnitude
+        if(shootPos-startPos).Magnitude<=getgenv().CONFIG.Ragebot.ShootRange and(hitPos-targetPos).Magnitude<=getgenv().CONFIG.Ragebot.HitRange and midpointToHeadDistance<=(getgenv().CONFIG.Ragebot.ShootRange*0.5)then
             if checkClearPath(startPos,shootPos) and checkClearPath(shootPos,hitPos) then
                 local shootToHitRay=Workspace:Raycast(shootPos,(hitPos-shootPos).Unit*(hitPos-shootPos).Magnitude,raycastParams)
-                if not shootToHitRay then table.insert(validPoints,{shootPos=shootPos,hitPos=hitPos,score=(shootPos-startPos).Magnitude+(hitPos-targetPos).Magnitude}) end
+                if not shootToHitRay then table.insert(validPoints,{shootPos=shootPos,hitPos=hitPos,score=(shootPos-startPos).Magnitude+(hitPos-targetPos).Magnitude+midpointToHeadDistance}) end
             end
         end
     end
